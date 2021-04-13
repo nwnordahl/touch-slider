@@ -17,6 +17,7 @@ slides.forEach((slide, index) => {
   // Touch events
   slide.addEventListener("touchstart", touchStart(index));
   slide.addEventListener("touchend", touchEnd);
+  slide.addEventListener("touchmove", touchMove);
 
   // Mouse events
   slide.addEventListener("mousedown", touchStart(index));
@@ -28,6 +29,7 @@ slides.forEach((slide, index) => {
 window.oncontextmenu = function (event) {
   event.preventDefault();
   event.stopPropagation();
+  return false;
 };
 
 function touchStart(index) {
@@ -44,6 +46,18 @@ function touchStart(index) {
 function touchEnd() {
   isDragging = false;
   cancelAnimationFrame(animationID);
+
+  const movedBy = currentTranslate - prevTranslate;
+
+  if (movedBy < -100 && currentIndex < slides.length - 1) {
+    currentIndex += 1;
+  }
+
+  if (movedBy > 100 && currentIndex > 0) {
+    currentIndex -= 1;
+  }
+
+  setPositionByIndex();
 
   slider.classList.remove("grabbing");
 }
@@ -66,4 +80,10 @@ function animation() {
 
 function setSliderPosition() {
   slider.style.transform = `translateX(${currentTranslate}px)`;
+}
+
+function setPositionByIndex() {
+  currentTranslate = currentIndex * -window.innerWidth;
+  prevTranslate = currentTranslate;
+  setSliderPosition();
 }
